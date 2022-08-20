@@ -46,8 +46,7 @@ const char* sippasswd = SIP_PASS;
 
 const char* sipdialnr1 = SIP_DIAL_NR1;
 const char* sipdialnr2 = SIP_DIAL_NR2;
-const char* sipdialtext1 = SIP_DIAL_TEXT1;
-const char* sipdialtext2 = SIP_DIAL_TEXT2;
+const char* sipsenderdesc = HOSTNAME;
 const int   sipdigit = SIP_DIAL_DIGIT;
 
 char caSipIn[2048];
@@ -303,7 +302,7 @@ void handle_button1() {
     {
       digitalWrite(LED, LOW);
       digitalWrite(OUT1, HIGH);
-      aSip.Dial(sipdialnr1, sipdialtext1);
+      aSip.Dial(sipdialnr1, sipsenderdesc);
       bInDial = true;
     }
     #endif
@@ -391,7 +390,7 @@ void handle_button2() {
     {
       digitalWrite(LED, LOW);
       digitalWrite(OUT2, HIGH);
-      aSip.Dial(sipdialnr2, sipdialtext2);
+      aSip.Dial(sipdialnr2, sipsenderdesc);
       bInDial = true;
     }
     #endif

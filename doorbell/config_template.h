@@ -15,10 +15,8 @@
 #define SIP_USER              "Your SIP server username"
 #define SIP_PASS              "Your SIP server password"
 
-#define SIP_DIAL_NR1          "Number to dial when button 1 is pressed"
-#define SIP_DIAL_NR2          "Number to dial when button 2 is pressed"
-#define SIP_DIAL_TEXT1        "Text for button 1"
-#define SIP_DIAL_TEXT2        "Text for button 2"
+#define SIP_DIAL_NR1          "11"
+#define SIP_DIAL_NR2          "12"
 #define SIP_DIAL_DIGIT        5
 
 #define BUTTON_DEBOUNCE_TIME  100u  /* [ms] */

@@ -25,10 +25,8 @@ The configuration is stored in `doorbell\config.h`. If file doesn't exist copy `
 | `SIP_PORT`          | Port of the SIP server to which the ESP should connect (typically 5060) |
 | `SIP_USER`          | Username used to connect to the SIP server |
 | `SIP_PASSWORD`      | Password used to connect to the SIP server |
-| `SIP_DIAL_NR1`      | Phone number which should be dialed when button 1 is pressed |
-| `SIP_DIAL_NR2`      | Phone number which should be dialed when button 2 is pressed |
-| `SIP_DIAL_TEXT1`    | Description which should be send when button 1 is pressed |
-| `SIP_DIAL_TEXT2`    | Description which should be send when button 2 is pressed |
+| `SIP_DIAL_NR1`      | Phone number which should be dialed when button 1 is pressed (typically "11") |
+| `SIP_DIAL_NR2`      | Phone number which should be dialed when button 2 is pressed (typically "12") |
 | `SIP_DIAL_DIGIT`    | Digit which, when received, opens the doorlock |
 | `SIP_MAX_DAIL_TIME` | Maximum time after which an unanswered call is terminated |
 

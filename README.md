@@ -9,13 +9,13 @@ Big thanks to the guys on mikrocontroller.net, especially Jürgen. I would never
 
 # Overview
 
-This repo contains the pcb files as well as the software to build an interface device which makes cheap doorbells smart. Just connect the board between your existing bell button and your chime. Depending on the software configuration the button can afterwards initiate a SIP call to one of your SIP phones, publish to an MQTT server or just ring your chime as before.
+This repo contains the pcb files as well as the software to build an interface device which makes cheap doorbells smart. Just connect the board between your existing bell button and your chime. Depending on the software configuration the button can afterwards ring your phones (via SIP), publish to an MQTT server or just ring your chime as before.
 
 <p align="center">
     <img src="docs/pcb.png?raw=true">
 </p>
 
-I started this project to get a cheap solution that rings my FRITZ!Fons (no crosstalk) whenever someone presses my doorbell's button. In addition i wanted to integrate the doorbell into my Home Assistant installation to be able to disable the bell when i don't want to be disturbed and get notifications via push messages when i'm away.
+I started this project to get a cheap solution that rings my FRITZ!Fons (just ring no crosstalk) whenever someone presses my doorbell's button. In addition i wanted to integrate the doorbell into my Home Assistant installation to be able to disable the bell when i don't want to be disturbed and get notifications via push messages when i'm away.
 
 Under the following links one can find the configuration description and two example setups:
 * [Configuration](docs/configuration.md)
