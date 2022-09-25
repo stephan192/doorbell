@@ -5,6 +5,9 @@
 #include "Sip.h"
 #include "config.h"
 
+#define HW_VERSION "v2"
+#define SW_VERSION "v1.1"
+
 #define IN1     12
 #define IN2     13
 #define OUT1    4
@@ -65,6 +68,7 @@ uint32_t ReconnectCounter = 0;
 PubSubClient mqtt_client(MQTT_SERVER, MQTT_PORT, esp_client);
 PubSubClientTools mqtt(mqtt_client);
 String unique_id;
+String avty_topic;
 #endif
 
 #if (DEVICE_CONFIG&MQTTLOCK_ENABLED)
@@ -167,7 +171,7 @@ void setup() {
   #if (DEVICE_CONFIG&MQTT_ENABLED)
   byte mac[6];
   WiFi.macAddress(mac);
-  unique_id = String(HOSTNAME) + "_" + String(mac[0], HEX) + String(mac[1], HEX) + String(mac[2], HEX) + String(mac[3], HEX) + String(mac[4], HEX) + String(mac[5], HEX);
+  unique_id = "doorbell_" + String(mac[0], HEX) + String(mac[1], HEX) + String(mac[2], HEX) + String(mac[3], HEX) + String(mac[4], HEX) + String(mac[5], HEX);
   unique_id.toLowerCase();
   Serial.print("MQTT client id: ");
   Serial.println(unique_id);
@@ -176,7 +180,7 @@ void setup() {
   Serial.print("Connecting to MQTT: ");
   Serial.print(MQTT_SERVER);
   Serial.print("...");
-  if (mqtt_client.connect(unique_id.c_str(), MQTT_USER, MQTT_PASSWORD)) {
+  if (mqtt_client.connect(unique_id.c_str(), MQTT_USER, MQTT_PASSWORD, avty_topic.c_str(), 0, true, "offline")) {
     Serial.println("connected");
     publish_mqtt_autodiscovery();
     mqtt_init_publish_and_subscribe();
@@ -492,7 +496,7 @@ void handle_lock() {
 
 #if (DEVICE_CONFIG&MQTT_ENABLED)
 void reconnect_mqtt() {
-  if (mqtt_client.connect(unique_id.c_str(), MQTT_USER, MQTT_PASSWORD)) {
+  if (mqtt_client.connect(unique_id.c_str(), MQTT_USER, MQTT_PASSWORD, avty_topic.c_str(), 0, true, "offline")) {
     mqtt_init_publish_and_subscribe();
   } else {
     delay(500);
@@ -500,6 +504,7 @@ void reconnect_mqtt() {
 }
 
 void mqtt_init_publish_and_subscribe() {
+  mqtt.publish(avty_topic, "online", true);
   #if (DEVICE_CONFIG&MQTTLOCK_ENABLED)
   mqtt.subscribe(lock_cmd_topic, lock_cmd_subscriber);
   #endif
@@ -528,6 +533,9 @@ void mqtt_init_publish_and_subscribe() {
 }
 
 void setup_mqtt_topics() {
+  avty_topic = "homeassistant/button/" + unique_id + "_door1/availability";
+  Serial.print("avty_topic: ");
+  Serial.println(avty_topic);
   #if (DEVICE_CONFIG&MQTTLOCK_ENABLED)
   lock_cmd_topic = "homeassistant/button/" + unique_id + "_door1/unlock";
   Serial.print("lock_cmd_topic: ");
@@ -564,30 +572,34 @@ void setup_mqtt_topics() {
 void publish_mqtt_autodiscovery() {
   String topic;
   String payload;
+
+  String device = "\"dev\":{\"ids\":\"" + unique_id + "\", \"name\":\"" + HOSTNAME + "\", \"mdl\":\"DOORBELL v2\", \"mf\":\"stephan192\", \"hw\":\"" + String(HW_VERSION) + "\", \"sw\":\"" + String(SW_VERSION) + "\"}";
+  String obj_id = String(HOSTNAME);
+  obj_id.toLowerCase();
   
   #if (DEVICE_CONFIG&MQTTBELL1_ENABLED)
   topic = "homeassistant/device_automation/" + unique_id + "_bell1/config";
-  payload = "{\"atype\":\"trigger\", \"t\":\"homeassistant/device_automation/" + unique_id + "_bell1/action\", \"type\":\"button_short_press\", \"stype\":\"button_1\", \"dev\":{\"ids\":\"" + unique_id + "\", \"name\":\"" + HOSTNAME + "\", \"mdl\":\"DOORBELL v2\", \"mf\":\"stephan192\"}}";
+  payload = "{\"atype\":\"trigger\", \"t\":\"homeassistant/device_automation/" + unique_id + "_bell1/action\", \"type\":\"button_short_press\", \"stype\":\"button_1\", " + device + "}";
   publish_oversize_payload(topic, payload, true);
   #endif
   #if (DEVICE_CONFIG&MQTTBELL2_ENABLED)
   topic = "homeassistant/device_automation/" + unique_id + "_bell2/config";
-  payload = "{\"atype\":\"trigger\", \"t\":\"homeassistant/device_automation/" + unique_id + "_bell2/action\", \"type\":\"button_short_press\", \"stype\":\"button_2\", \"dev\":{\"ids\":\"" + unique_id + "\", \"name\":\"" + HOSTNAME + "\", \"mdl\":\"DOORBELL v2\", \"mf\":\"stephan192\"}}";
+  payload = "{\"atype\":\"trigger\", \"t\":\"homeassistant/device_automation/" + unique_id + "_bell2/action\", \"type\":\"button_short_press\", \"stype\":\"button_2\", " + device + "}";
   publish_oversize_payload(topic, payload, true);
   #endif
   #if (DEVICE_CONFIG&MQTTLOCK_ENABLED)
   topic = "homeassistant/button/" + unique_id + "_door1/config";
-  payload = "{\"cmd_t\":\"homeassistant/button/" + unique_id + "_door1/unlock\", \"uniq_id\":\"" + unique_id + "_door1\", \"obj_id\":\"" + unique_id + "_door1\", \"name\":\"Door\", \"icon\":\"mdi:door\", \"dev\":{\"ids\":\"" + unique_id + "\", \"name\":\"" + HOSTNAME + "\", \"mdl\":\"DOORBELL v2\", \"mf\":\"stephan192\"}}";
+  payload = "{\"cmd_t\":\"homeassistant/button/" + unique_id + "_door1/unlock\", \"avty_t\":\"" + avty_topic + "\", \"uniq_id\":\"" + unique_id + "_door1\", \"obj_id\":\"" + obj_id + "_door1\", \"name\":\"Door\", \"icon\":\"mdi:door\", " + device + "}";
   publish_oversize_payload(topic, payload, true);
   #endif
   #if (DEVICE_CONFIG&MQTTBUTTON1_ENABLED)
   topic = "homeassistant/switch/" + unique_id + "_button1/config";
-  payload = "{\"~\":\"homeassistant/switch/" + unique_id + "_button1\", \"cmd_t\":\"~/set\", \"stat_t\":\"~/state\", \"uniq_id\":\"" + unique_id + "_button1\", \"obj_id\":\"" + unique_id + "_button1\", \"name\":\"Button 1\", \"icon\":\"mdi:bell\", \"dev\":{\"ids\":\"" + unique_id + "\", \"name\":\"" + HOSTNAME + "\", \"mdl\":\"DOORBELL v2\", \"mf\":\"stephan192\"}}";
+  payload = "{\"~\":\"homeassistant/switch/" + unique_id + "_button1\", \"cmd_t\":\"~/set\", \"stat_t\":\"~/state\", \"avty_t\":\"" + avty_topic + "\", \"uniq_id\":\"" + unique_id + "_button1\", \"obj_id\":\"" + obj_id + "_button1\", \"name\":\"Button 1\", \"icon\":\"mdi:bell\", " + device + "}";
   publish_oversize_payload(topic, payload, true);
   #endif
   #if (DEVICE_CONFIG&MQTTBUTTON2_ENABLED)
   topic = "homeassistant/switch/" + unique_id + "_button2/config";
-  payload = "{\"~\":\"homeassistant/switch/" + unique_id + "_button2\", \"cmd_t\":\"~/set\", \"stat_t\":\"~/state\", \"uniq_id\":\"" + unique_id + "_button2\", \"obj_id\":\"" + unique_id + "_button2\", \"name\":\"Button 2\", \"icon\":\"mdi:bell\", \"dev\":{\"ids\":\"" + unique_id + "\", \"name\":\"" + HOSTNAME + "\", \"mdl\":\"DOORBELL v2\", \"mf\":\"stephan192\"}}";
+  payload = "{\"~\":\"homeassistant/switch/" + unique_id + "_button2\", \"cmd_t\":\"~/set\", \"stat_t\":\"~/state\", \"avty_t\":\"" + avty_topic + "\", \"uniq_id\":\"" + unique_id + "_button2\", \"obj_id\":\"" + obj_id + "_button2\", \"name\":\"Button 2\", \"icon\":\"mdi:bell\", " + device + "}";
   publish_oversize_payload(topic, payload, true);
   #endif
   Serial.println("MQTT autodiscovery sent");
