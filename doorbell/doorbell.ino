@@ -6,7 +6,7 @@
 #include "config.h"
 
 #define HW_VERSION "v2"
-#define SW_VERSION "v1.1"
+#define SW_VERSION "v1.2"
 
 #define IN1     12
 #define IN2     13
@@ -589,17 +589,17 @@ void publish_mqtt_autodiscovery() {
   #endif
   #if (DEVICE_CONFIG&MQTTLOCK_ENABLED)
   topic = "homeassistant/button/" + unique_id + "_door1/config";
-  payload = "{\"cmd_t\":\"homeassistant/button/" + unique_id + "_door1/unlock\", \"avty_t\":\"" + avty_topic + "\", \"uniq_id\":\"" + unique_id + "_door1\", \"obj_id\":\"" + obj_id + "_door1\", \"name\":\"Door\", \"icon\":\"mdi:door\", " + device + "}";
+  payload = "{\"cmd_t\":\"homeassistant/button/" + unique_id + "_door1/unlock\", \"avty_t\":\"" + avty_topic + "\", \"uniq_id\":\"" + unique_id + "_door1\", \"def_ent_id\":\"button." + obj_id + "_door1\", \"name\":\"Door\", \"icon\":\"mdi:door\", " + device + "}";
   publish_oversize_payload(topic, payload, true);
   #endif
   #if (DEVICE_CONFIG&MQTTBUTTON1_ENABLED)
   topic = "homeassistant/switch/" + unique_id + "_button1/config";
-  payload = "{\"~\":\"homeassistant/switch/" + unique_id + "_button1\", \"cmd_t\":\"~/set\", \"stat_t\":\"~/state\", \"avty_t\":\"" + avty_topic + "\", \"uniq_id\":\"" + unique_id + "_button1\", \"obj_id\":\"" + obj_id + "_button1\", \"name\":\"Button 1\", \"icon\":\"mdi:bell\", " + device + "}";
+  payload = "{\"~\":\"homeassistant/switch/" + unique_id + "_button1\", \"cmd_t\":\"~/set\", \"stat_t\":\"~/state\", \"avty_t\":\"" + avty_topic + "\", \"uniq_id\":\"" + unique_id + "_button1\", \"def_ent_id\":\"switch." + obj_id + "_button1\", \"name\":\"Button 1\", \"icon\":\"mdi:bell\", " + device + "}";
   publish_oversize_payload(topic, payload, true);
   #endif
   #if (DEVICE_CONFIG&MQTTBUTTON2_ENABLED)
   topic = "homeassistant/switch/" + unique_id + "_button2/config";
-  payload = "{\"~\":\"homeassistant/switch/" + unique_id + "_button2\", \"cmd_t\":\"~/set\", \"stat_t\":\"~/state\", \"avty_t\":\"" + avty_topic + "\", \"uniq_id\":\"" + unique_id + "_button2\", \"obj_id\":\"" + obj_id + "_button2\", \"name\":\"Button 2\", \"icon\":\"mdi:bell\", " + device + "}";
+  payload = "{\"~\":\"homeassistant/switch/" + unique_id + "_button2\", \"cmd_t\":\"~/set\", \"stat_t\":\"~/state\", \"avty_t\":\"" + avty_topic + "\", \"uniq_id\":\"" + unique_id + "_button2\", \"def_ent_id\":\"switch." + obj_id + "_button2\", \"name\":\"Button 2\", \"icon\":\"mdi:bell\", " + device + "}";
   publish_oversize_payload(topic, payload, true);
   #endif
   Serial.println("MQTT autodiscovery sent");
