@@ -6,7 +6,7 @@
 #include "config.h"
 
 #define HW_VERSION "v2"
-#define SW_VERSION "v1.2"
+#define SW_VERSION "v1.3"
 
 #define IN1     12
 #define IN2     13
@@ -180,7 +180,7 @@ void setup() {
   Serial.print("Connecting to MQTT: ");
   Serial.print(MQTT_SERVER);
   Serial.print("...");
-  if (mqtt_client.connect(unique_id.c_str(), MQTT_USER, MQTT_PASSWORD, avty_topic.c_str(), 0, true, "offline")) {
+  if (connect_mqtt()) {
     Serial.println("connected");
     publish_mqtt_autodiscovery();
     mqtt_init_publish_and_subscribe();
@@ -496,10 +496,25 @@ void handle_lock() {
 
 #if (DEVICE_CONFIG&MQTT_ENABLED)
 void reconnect_mqtt() {
-  if (mqtt_client.connect(unique_id.c_str(), MQTT_USER, MQTT_PASSWORD, avty_topic.c_str(), 0, true, "offline")) {
+  if (connect_mqtt()) {
     mqtt_init_publish_and_subscribe();
   } else {
     delay(500);
+  }
+}
+
+bool connect_mqtt() {
+  if (mqtt_client.connect(unique_id.c_str(), MQTT_USER, MQTT_PASSWORD, avty_topic.c_str(), 0, true, "offline")) {
+    // Run loop a few times before proceeding
+    for (int i = 0; i < 50; i++) {
+      mqtt_client.loop();
+      delay(10);
+    }
+    return mqtt_client.connected();
+  }
+  else
+  {
+    return false;
   }
 }
 
